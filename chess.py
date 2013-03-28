@@ -104,24 +104,19 @@ class Chess(object):
                 x = coords1[1]+1
                 while x < coords2[1]:
                     if self.board[coords1[0]][x] != self.EMPTY:
-                        print "y-axis path not clear"
-                        return False
                     else:
                         x += 1
             # y-axis path
             elif coords1[1]-coords2[1] == 0:
                 x = coords1[0]+1
                 while x < coords2[0]:
-                    print "self.board[coords1[1]][x]: %r" % (self.board[coords1[1]][x])
                     if self.board[x][coords1[1]] != self.EMPTY:
-                        print "x-axis path not clear"
                         return False
                     else:
                         x += 1
 
             # Ensures move is only along one axis
             if coords1[0]-coords2[0] != 0 and coords1[1]-coords2[1] != 0:
-                print "not only 1 direction"
                 return False
             
             return True
