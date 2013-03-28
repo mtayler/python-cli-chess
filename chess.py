@@ -175,9 +175,9 @@ class Chess(object):
 
         def king(coords1, coords2):
             # Checks if move less than 2 squares
-            if abs(coords1[0]-coords2[0]) < 2 \
-                    and abs(coords2[1]-coords2[1]) < 2:
+            if abs(coords1[0]-coords2[0]) > 1 or abs(coords1[1]-coords2[1]) > 1:
                 return False
+
             # Checks if valid  using queen
             return queen(coords1, coords2)
 
