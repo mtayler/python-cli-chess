@@ -6,14 +6,14 @@ class TestStart(object):
         game.start()
 
         assert_equal(game.__str__(), "   a  b  c  d  e  f  g  h\n"\
-                                     "1 [r][h][b][q][k][b][h][r]\n"\
-                                     "2 [p][p][p][p][p][p][p][p]\n"\
+                                     "1 [R][H][B][Q][K][B][H][R]\n"\
+                                     "2 [P][P][P][P][P][P][P][P]\n"\
                                      "3 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
                                      "4 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
                                      "5 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
                                      "6 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
-                                     "7 [P][P][P][P][P][P][P][P]\n"\
-                                     "8 [R][H][B][Q][K][B][H][R]") 
+                                     "7 [p][p][p][p][p][p][p][p]\n"\
+                                     "8 [r][h][b][q][k][b][h][r]") 
 
 class TestCheck(object):
     def setup(self):
@@ -35,11 +35,16 @@ class TestCheck(object):
         assert_equal(self.game.check_move(('b',2), ('c',3)), True)
 
         # Check piece in path
-        self.game.board[2][1] = '[P]'
+        self.game.board[1][2] = '[P]'
         self.game.board[1][1] = '[P]'
         assert_equal(self.game.check_move(('b',2), ('b',3)), False)
         assert_equal(self.game.check_move(('b',2), ('b',4)), False)
 
+        # Check backwards moves
+        self.game.board[3][4] = '[P]'
+        assert_equal(self.game.check_move(('d',5), ('d',4)), False)
+        self.game.board[3][4] = '[p]'
+        assert_equal(self.game.check_move(('d',5), ('d',6)), False)
     def test_check_rook(self):
         # Check check_move along x axis
         self.game.board[0][1] = '[ ]'
@@ -112,25 +117,25 @@ class TestCheck(object):
 #    def test_move_pawn(self):
 #        self.game.move(('b',2), ('b',3))
 #        assert_equal(self.game.__str__(), "   a  b  c  d  e  f  g  h\n"\
-#                                          "1 [r][h][b][q][k][b][h][r]\n"\
-#                                          "2 [p][ ][p][p][p][p][p][p]\n"\
-#                                          "3 [ ][p][ ][ ][ ][ ][ ][ ]\n"\
+#                                          "1 [R][H][B][Q][K][B][H][R]\n"\
+#                                          "2 [P][ ][P][P][P][P][P][P]\n"\
+#                                          "3 [ ][P][ ][ ][ ][ ][ ][ ]\n"\
 #                                          "4 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
 #                                          "5 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
 #                                          "6 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
-#                                          "7 [P][P][P][P][P][P][P][P]\n"\
-#                                          "8 [R][H][B][Q][K][B][H][R]")    
+#                                          "7 [p][p][p][p][p][p][p][p]\n"\
+#                                          "8 [r][h][b][q][k][b][h][r]")    
 #
 #        self.game.move(('d',2), ('d',4))
 #        assert_equal(self.game.__str__(), "   a  b  c  d  e  f  g  h\n"\
-#                                          "1 [r][h][b][q][k][b][h][r]\n"\
-#                                          "2 [p][ ][p][ ][p][p][p][p]\n"\
-#                                          "3 [ ][p][ ][ ][ ][ ][ ][ ]\n"\
-#                                          "4 [ ][ ][ ][p][ ][ ][ ][ ]\n"\
+#                                          "1 [R][H][B][Q][K][B][H][R]\n"\
+#                                          "2 [P][ ][P][ ][P][P][P][P]\n"\
+#                                          "3 [ ][P][ ][ ][ ][ ][ ][ ]\n"\
+#                                          "4 [ ][ ][ ][P][ ][ ][ ][ ]\n"\
 #                                          "5 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
 #                                          "6 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
-#                                          "7 [P][P][P][P][P][P][P][P]\n"\
-#                                          "8 [R][H][B][Q][K][B][H][R]")    
+#                                          "7 [p][p][p][p][p][p][p][p]\n"\
+#                                          "8 [r][h][b][q][k][b][h][r]")    
 #
 #        assert_equal(self.game.move(('c',2), ('d',1)), self.bad_move)
 #        assert_equal(self.game.move(('f',2), ('g',3)), self.bad_move)
@@ -139,36 +144,36 @@ class TestCheck(object):
 #        self.game.board[0][1] = '[ ]'
 #        self.game.move(('a',1), ('a',3))
 #        assert_equal(self.game.__str__(),  "   a  b  c  d  e  f  g  h\n"\
-#                                           "1 [ ][h][b][q][k][b][h][r]\n"\
-#                                           "2 [ ][p][p][p][p][p][p][p]\n"\
-#                                           "3 [r][ ][ ][ ][ ][ ][ ][ ]\n"\
+#                                           "1 [ ][H][B][Q][K][B][H][R]\n"\
+#                                           "2 [ ][P][P][P][P][P][P][P]\n"\
+#                                           "3 [R][ ][ ][ ][ ][ ][ ][ ]\n"\
 #                                           "4 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
 #                                           "5 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
 #                                           "6 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
-#                                           "7 [P][P][P][P][P][P][P][P]\n"\
-#                                           "8 [R][H][B][Q][K][B][H][R]") 
+#                                           "7 [p][p][p][p][p][p][p][p]\n"\
+#                                           "8 [r][h][b][q][k][b][h][r]") 
 #
 #        self.game.board[1][0] = '[ ]'
 #        self.game.move(('a',3), ('a',5))
 #        assert_equal(self.game.__str__(),  "   a  b  c  d  e  f  g  h\n"\
-#                                           "1 [ ][h][b][q][k][b][h][r]\n"\
-#                                           "2 [ ][p][p][p][p][p][p][p]\n"\
-#                                           "3 [r][ ][ ][ ][ ][ ][ ][ ]\n"\
+#                                           "1 [ ][H][B][Q][K][B][H][R]\n"\
+#                                           "2 [ ][P][P][P][P][P][P][P]\n"\
+#                                           "3 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
 #                                           "4 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
-#                                           "5 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
+#                                           "5 [R][ ][ ][ ][ ][ ][ ][ ]\n"\
 #                                           "6 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
-#                                           "7 [P][P][P][P][P][P][P][P]\n"\
-#                                           "8 [R][H][B][Q][K][B][H][R]")   
+#                                           "7 [p][p][p][p][p][p][p][p]\n"\
+#                                           "8 [r][h][b][q][k][b][h][r]")   
 #
 #        self.game.move(('a',5), ('e',5))
 #        assert_equal(self.game.__str__(),  "   a  b  c  d  e  f  g  h\n"\
-#                                           "1 [ ][h][b][q][k][b][h][r]\n"\
-#                                           "2 [ ][p][p][p][p][p][p][p]\n"\
+#                                           "1 [R][H][B][Q][K][B][H][R]\n"\
+#                                           "2 [P][P][P][P][P][P][P][P]\n"\
 #                                           "3 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
 #                                           "4 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
-#                                           "5 [ ][ ][ ][ ][r][ ][ ][ ]\n"\
+#                                           "5 [ ][ ][ ][ ][R][ ][ ][ ]\n"\
 #                                           "6 [ ][ ][ ][ ][ ][ ][ ][ ]\n"\
-#                                           "7 [P][P][P][P][P][P][P][P]\n"\
-#                                           "8 [R][H][B][Q][K][B][H][R]") 
+#                                           "7 [p][p][p][p][p][p][p][p]\n"\
+#                                           "8 [r][h][b][q][k][b][h][r]") 
 #
 #        assert_equal(self.game.move(('e',5), ('f',4)), self.bad_move)

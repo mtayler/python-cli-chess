@@ -2,19 +2,19 @@ class Chess(object):
     # All possible values for board
     EMPTY = '[ ]' 
 
-    WHITE_PAWN = '[p]'
-    WHITE_KING = '[k]'
-    WHITE_QUEEN = '[q]'
-    WHITE_BISHOP = '[b]'
-    WHITE_KNIGHT = '[h]'
-    WHITE_ROOK = '[r]'
+    BLACK_PAWN = '[p]'
+    BLACK_KING = '[k]'
+    BLACK_QUEEN = '[q]'
+    BLACK_BISHOP = '[b]'
+    BLACK_KNIGHT = '[h]'
+    BLACK_ROOK = '[r]'
 
-    BLACK_PAWN = '[P]'
-    BLACK_KING = '[K]'
-    BLACK_QUEEN = '[Q]'
-    BLACK_BISHOP = '[B]'
-    BLACK_KNIGHT = '[H]'
-    BLACK_ROOK = '[R]' 
+    WHITE_PAWN = '[P]'
+    WHITE_KING = '[K]'
+    WHITE_QUEEN = '[Q]'
+    WHITE_BISHOP = '[B]'
+    WHITE_KNIGHT = '[H]'
+    WHITE_ROOK = '[R]' 
 
 
     def __init__(self):
@@ -22,6 +22,8 @@ class Chess(object):
         # Records captured pieces
         self.white_captured = ""
         self.black_captured = ""
+
+        self.moved_pawns = []
 
     # Resets game board
     def start(self):
@@ -59,40 +61,51 @@ class Chess(object):
         """
 
         def pawn(coords1, coords2):
-            # Checks if move is along y axis
-            if coords1[0]-coords2[0] != 0:
-                return False
-
             # Checks if move is forwards
-            if coord1[1]-coords2[1] < 0:
+            if coords2[1]-coords1[1] < 0 and piece == self.WHITE_PAWN:
+                print "Black move not forwards"
+                return False
+            if coords2[1]-coords1[1] > 0 and piece == self.BLACK_PAWN:
+                print "White move not forwards"
                 return False
 
             # Checks if piece in movement path
-            if coords1[0]-coords2[0] == 0:
-                x = coords1[1]
-                # <= because pawns can't capture forwards
-                while x <= coords2[1]:
-                    if self.board[coords1[0]][x] != self.EMPTY:
-                        print 'piece in path'
-                        return False
-                    else:
-                        x += 1
+            x = coords1[1]+1
+            # <= because pawns can't capture forwards
+            while x <= coords2[1]:
+                if self.board[coords1[0]][x] != self.EMPTY:
+                    print 'piece in path'
+                    return False
+                else:
+                    x += 1
 
             # Checks if pawn can make "capture" move (diagnol)
             if abs(coords1[0]-coords2[0]) == 1 and abs(coords1[1]-coords2[1]) == 1:
                 if self.board[coords2[0]][coords2[1]] == self.EMPTY:
                     print "capture move invalid"
                     return False 
-
-            # Checks if pawn can move 2 squares
-            elif coords1[0] == 1 or coords1[0] == 6 and \
-                    coords1 not in self.moved_pawns:
-                if not abs(coords1[0]-coords2[0]) < 3:
+            # Checks if move along y-axis
+            else:
+                if coords1[0]-coords2[0] != 0:
+                    print "move along y-axis"
                     return False
 
-            # Checks if pawn moves less than 2 squares
+
+            # Checks if pawn can move 2 squares
+            if abs(coords1[1]-coords2[1]) > 1 and coords1 in self.moved_pawns:
+                print "pawn cannot move 2 squares"
+                return False
+
+            # If pawn can move 2, checks if moves more than 2 
+            if coords1[0] == 1 or coords1[0] == 6 and \
+                    coords1 not in self.moved_pawns:
+                if abs(coords1[1]-coords2[1]) > 2:
+                    print "pawn cannot move more than 2 squares"
+                    return False
+            # If pawn can't move 2, checks if moves more than 1
             else:
-                if not abs(coords1[0]-coords2[0]) < 2:
+                if abs(coords1[1]-coords2[1]) > 1:
+                    print "pawn cannot move more than 1 square"
                     return False
 
             return True
@@ -104,6 +117,7 @@ class Chess(object):
                 x = coords1[1]+1
                 while x < coords2[1]:
                     if self.board[coords1[0]][x] != self.EMPTY:
+                        return False
                     else:
                         x += 1
             # y-axis path
