@@ -8,6 +8,8 @@ class Chess(object):
     BLACK_BISHOP = '[b]'
     BLACK_KNIGHT = '[h]'
     BLACK_ROOK = '[r]'
+    BLACK_PIECES = (BLACK_PAWN, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT,
+            BLACK_ROOK)
 
     WHITE_PAWN = '[P]'
     WHITE_KING = '[K]'
@@ -15,13 +17,20 @@ class Chess(object):
     WHITE_BISHOP = '[B]'
     WHITE_KNIGHT = '[H]'
     WHITE_ROOK = '[R]' 
+    WHITE_PIECES = (WHITE_PAWN, WHITE_KING, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT,
+            WHITE_ROOK)
+    
+
+    # Turn values
+    WHITE = 0
+    BLACK = 1
 
 
     def __init__(self):
         self.board = [['[ ]']*8 for x in xrange(8)]
         # Records captured pieces
-        self.white_captured = ""
-        self.black_captured = ""
+        self.white_captured = []
+        self.black_captured = []
 
         self.moved_pawns = []
 
@@ -30,8 +39,8 @@ class Chess(object):
         """
         Resets board and captured pieces.
         """
-        self.white_captured = ""
-        self.black_captured = ""
+        self.white_captured = []
+        self.black_captured = []
 
         start_board = self.board[:]
         for i in range(0, 8):
@@ -52,14 +61,13 @@ class Chess(object):
         self.board = start_board
 
     # Checks if move valid
-    def check_move(self, coords1, coords2):
+    def check_move(self, turn, coords1, coords2):
         """
         coords1: Tuple of (int,int), both ints valid indices of board; from place
         coords2: Tuple of (int,int), both ints valid indices of board; to place
         
         Checks if move is valid.
         """
-
         def pawn(coords1, coords2):
             # Checks if move is forwards
             if coords2[1]-coords1[1] < 0 and piece == self.WHITE_PAWN:
@@ -97,8 +105,7 @@ class Chess(object):
                 return False
 
             # If pawn can move 2, checks if moves more than 2 
-            if coords1[0] == 1 or coords1[0] == 6 and \
-                    coords1 not in self.moved_pawns:
+            if coords1 not in self.moved_pawns:
                 if abs(coords1[1]-coords2[1]) > 2:
                     print "pawn cannot move more than 2 squares"
                     return False
@@ -124,6 +131,7 @@ class Chess(object):
             elif coords1[1]-coords2[1] == 0:
                 x = coords1[0]+1
                 while x < coords2[0]:
+                    print "x, coords1[1]: %r, %r" % (x, coords1[1])
                     if self.board[x][coords1[1]] != self.EMPTY:
                         return False
                     else:
@@ -138,9 +146,6 @@ class Chess(object):
         def knight(coords1, coords2):
             x_delta = abs(coords1[0]-coords2[0])
             y_delta = abs(coords1[1]-coords2[1])
-
-            print "x_delta: %r" % x_delta
-            print "y_delta: %r" % y_delta
 
             if y_delta == 2 and x_delta == 1:
                 print "Vertical L"
@@ -181,15 +186,15 @@ class Chess(object):
             # Checks if valid  using queen
             return queen(coords1, coords2)
 
-
         if coords2[0] > 'h' or coords2[1] > 8:
             return False
 
-        # Remove after move is implemented
-        coords1 = (ord(coords1[0])-ord('a'), coords1[1]-1)
-        coords2 = (ord(coords2[0])-ord('a'), coords2[1]-1)
-
         piece = self.board[coords1[0]][coords1[1]]
+
+        if turn == self.BLACK and piece not in self.BLACK_PIECES:
+            return False
+        if turn == self.WHITE and piece not in self.WHITE_PIECES:
+            return False
 
         if piece == self.WHITE_PAWN or piece == self.BLACK_PAWN:
             return pawn(coords1, coords2)
@@ -207,33 +212,63 @@ class Chess(object):
             return False
 
     # Checks if valid, then moves. Also checks for captures
-    def move(self, coords1, coords2):
+    def move(self, turn, coords1, coords2):
         """
         coords1: Tuple of (int,char); from space
         coords2: Tuple of (int,char); to space
         
         Moves pieces.
         """
-        # sets coords to array values (eg. 1 -> 0)
-        coords1 = (ord(coords1[0])-ord('a'), coord1[1]-1)
-        coords2 = (ord(coords2[0])-ord('a'), coord2[1]-1)
+        invalid_move = "Invalid move."
+        invalid_piece = "That is not your piece."
 
-        if self.check_move(coords1, coords2):
-            # TODO Implement moving and capturing
-            pass
+        # sets coords to array values (eg. 1 -> 0, 'a' -> 0)
+        coords1 = (ord(coords1[0])-ord('a'), coords1[1]-1)
+        coords2 = (ord(coords2[0])-ord('a'), coords2[1]-1)
+
+        if self.check_move(turn, coords1, coords2):
+            if self.board[coords2[0]][coords2[1]] != self.EMPTY:
+                if turn == self.WHITE:
+                    if self.board[coords2[0]][coords2[1]] in self.WHITE_PIECES:
+                        return invalid_move
+
+                    else:
+                        self.white_captured.append(self.board[coords2[0]][coords2[1]])
+                elif turn == self.BLACK:
+                    if self.board[coords2[0]][coords2[1]] in self.BLACK_PIECES:
+                        return invalid_move
+
+                    else:
+                        self.black_captured.append(self.board[coords2[0]][coords2[1]]) 
+            self.board[coords2[0]][coords2[1]] = self.board[coords1[0]][coords1[1]]
+            self.board[coords1[0]][coords1[1]] = self.EMPTY
+
+        else:
+            return invalid_move
+
 
     def __str__(self):
         output = ''
-        output += "   a  b  c  d  e  f  g  h"
 
+        for x in self.black_captured:
+            output += x
+        output += "\n"
+
+        output += "   a  b  c  d  e  f  g  h"
         for k in range(len(self.board)):
             output += "\n%d " % (k+1)
             for j in range(len(self.board[k])):
                 output += self.board[j][k]
 
-        #for j in range(1,9):
-        #    output += "\n%d " % j
-        #    for i in self.board[j-1]:
-        #        output += str(i) 
-
+        output += "\n"
+        for x in self.white_captured:
+            output += x
+        
         return output
+
+def main():
+    print "Welcome to a commandline interface version of chess!"
+    print "Input moves as <from> <to> (eg. a2 a3)"
+    print "Read the README for more info!"
+
+
