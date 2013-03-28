@@ -171,7 +171,7 @@ class Chess(object):
 
         def queen(coords1, coords2):
             # Checks if valid using bishop and rook
-            return bishop(coords1, coords2) and rook(coords1, coords2)
+            return bishop(coords1, coords2) or rook(coords1, coords2)
 
         def king(coords1, coords2):
             # Checks if move less than 2 squares
