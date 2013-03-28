@@ -8,8 +8,6 @@ class Chess(object):
     BLACK_BISHOP = '[b]'
     BLACK_KNIGHT = '[h]'
     BLACK_ROOK = '[r]'
-    BLACK_PIECES = (BLACK_PAWN, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT,
-            BLACK_ROOK)
 
     WHITE_PAWN = '[P]'
     WHITE_KING = '[K]'
@@ -17,9 +15,15 @@ class Chess(object):
     WHITE_BISHOP = '[B]'
     WHITE_KNIGHT = '[H]'
     WHITE_ROOK = '[R]' 
+    
+    # Coloured lists of pieces
+    BLACK_PIECES = (BLACK_PAWN, BLACK_KING, BLACK_QUEEN, BLACK_BISHOP, BLACK_KNIGHT,
+            BLACK_ROOK)
     WHITE_PIECES = (WHITE_PAWN, WHITE_KING, WHITE_QUEEN, WHITE_BISHOP, WHITE_KNIGHT,
             WHITE_ROOK)
-    
+
+    # List of pawn pieces
+    PAWNS = (WHITE_PAWN, BLACK_PAWN)
 
     # Turn values
     WHITE = 0
@@ -28,8 +32,9 @@ class Chess(object):
 
     def __init__(self):
         self.board = [['[ ]']*8 for x in xrange(8)]
-        # Records captured pieces
+        # Pieces white has captured
         self.white_captured = []
+        # Pieces black has captured
         self.black_captured = []
 
         self.moved_pawns = []
@@ -71,10 +76,8 @@ class Chess(object):
         def pawn(coords1, coords2):
             # Checks if move is forwards
             if coords2[1]-coords1[1] < 0 and piece == self.WHITE_PAWN:
-                print "Black move not forwards"
                 return False
             if coords2[1]-coords1[1] > 0 and piece == self.BLACK_PAWN:
-                print "White move not forwards"
                 return False
 
             # Checks if piece in movement path
@@ -82,7 +85,6 @@ class Chess(object):
             # <= because pawns can't capture forwards
             while x <= coords2[1]:
                 if self.board[coords1[0]][x] != self.EMPTY:
-                    print 'piece in path'
                     return False
                 else:
                     x += 1
@@ -90,29 +92,24 @@ class Chess(object):
             # Checks if pawn can make "capture" move (diagnol)
             if abs(coords1[0]-coords2[0]) == 1 and abs(coords1[1]-coords2[1]) == 1:
                 if self.board[coords2[0]][coords2[1]] == self.EMPTY:
-                    print "capture move invalid"
                     return False 
             # Checks if move along y-axis
             else:
                 if coords1[0]-coords2[0] != 0:
-                    print "move along y-axis"
                     return False
 
 
             # Checks if pawn can move 2 squares
             if abs(coords1[1]-coords2[1]) > 1 and coords1 in self.moved_pawns:
-                print "pawn cannot move 2 squares"
                 return False
 
             # If pawn can move 2, checks if moves more than 2 
             if coords1 not in self.moved_pawns:
                 if abs(coords1[1]-coords2[1]) > 2:
-                    print "pawn cannot move more than 2 squares"
                     return False
             # If pawn can't move 2, checks if moves more than 1
             else:
                 if abs(coords1[1]-coords2[1]) > 1:
-                    print "pawn cannot move more than 1 square"
                     return False
 
             return True
@@ -131,7 +128,6 @@ class Chess(object):
             elif coords1[1]-coords2[1] == 0:
                 x = coords1[0]+1
                 while x < coords2[0]:
-                    print "x, coords1[1]: %r, %r" % (x, coords1[1])
                     if self.board[x][coords1[1]] != self.EMPTY:
                         return False
                     else:
@@ -148,11 +144,9 @@ class Chess(object):
             y_delta = abs(coords1[1]-coords2[1])
 
             if y_delta == 2 and x_delta == 1:
-                print "Vertical L"
                 return True
 
             elif y_delta == 1 and x_delta == 2:
-                print "Horizontal L"
                 return True
 
             return False
@@ -160,6 +154,9 @@ class Chess(object):
         def bishop(coords1, coords2):
             # Checks if move is diagnol
             if abs(coords1[0]-coords2[0]) != abs(coords1[1]-coords2[1]):
+                print "not diagnol"
+                print "diag check", abs(coords1[0]-coords2[0]) != abs(coords1[1]-coords2[1])
+
                 return False
 
             # Checks if path is empty
@@ -167,6 +164,7 @@ class Chess(object):
             y = coords2[0]+1
             while x < coords2[1] or y < coords2[1]:
                 if self.board[x][y] != self.EMPTY:
+                    print "path not empty"
                     return False
                 else:
                     x += 1
@@ -185,9 +183,6 @@ class Chess(object):
 
             # Checks if valid  using queen
             return queen(coords1, coords2)
-
-        if coords2[0] > 'h' or coords2[1] > 8:
-            return False
 
         piece = self.board[coords1[0]][coords1[1]]
 
@@ -222,20 +217,29 @@ class Chess(object):
         invalid_move = "Invalid move."
         invalid_piece = "That is not your piece."
 
+        if coords2[0] > 'h' or coords2[1] > 8:
+            return invalid_move
+
         # sets coords to array values (eg. 1 -> 0, 'a' -> 0)
         coords1 = (ord(coords1[0])-ord('a'), coords1[1]-1)
         coords2 = (ord(coords2[0])-ord('a'), coords2[1]-1)
 
         if self.check_move(turn, coords1, coords2):
+            # if pawn, adds to moved pawn list
+            if self.board[coords1[0]][coords2[1]] in self.PAWNS:
+                self.moved_pawns.append(coords1)
+
             if self.board[coords2[0]][coords2[1]] != self.EMPTY:
                 if turn == self.WHITE:
                     if self.board[coords2[0]][coords2[1]] in self.WHITE_PIECES:
+                        print "to friendly"
                         return invalid_move
 
                     else:
                         self.white_captured.append(self.board[coords2[0]][coords2[1]])
                 elif turn == self.BLACK:
                     if self.board[coords2[0]][coords2[1]] in self.BLACK_PIECES:
+                        print 'to friendly'
                         return invalid_move
 
                     else:
@@ -246,13 +250,32 @@ class Chess(object):
         else:
             return invalid_move
 
+        return self.__str__() 
+
+    def get_captured(self, colour):
+        """
+        colour: str, colour of player's captured pieces.
+
+        Assumes colour is valid.
+        """
+        if colour == "white":
+            return len(self.white_captured)
+        elif colour == "black":
+            return len(self.black_captured)
+
 
     def __str__(self):
         output = ''
 
-        for x in self.black_captured:
-            output += x
-        output += "\n"
+        capped = ''
+        capped += "\nCapped: "
+        for x in self.white_captured:
+            if len(capped)%25 == 0:
+                capped += "\n"
+            capped += x.strip("[]")
+        capped += "\n\n"
+
+        output += capped
 
         output += "   a  b  c  d  e  f  g  h"
         for k in range(len(self.board)):
@@ -260,15 +283,101 @@ class Chess(object):
             for j in range(len(self.board[k])):
                 output += self.board[j][k]
 
-        output += "\n"
-        for x in self.white_captured:
-            output += x
+        capped = ''
+        capped += "\n\nCapped:"
+        for x in self.black_captured:
+            if len(capped)%25 == 0:
+                capped += "\n"
+            capped += x.strip("[]")
+        capped += "\n"
+        
+        output += capped
         
         return output
 
-def main():
-    print "Welcome to a commandline interface version of chess!"
-    print "Input moves as <from> <to> (eg. a2 a3)"
-    print "Read the README for more info!"
+class Engine():
+    def __init__(self):
+        print "Welcome to a commandline interface version of chess!"
+        print
+        print "Player 1 is White, Player 2 is Black."
+        print "White pieces are uppercase, black pieces are lowercase."
+        print
+        print "Input moves as <from> <to> (eg. a2 a3)."
+        print "Type 'quit' to quit."
+        print "If you need help at anytime, try 'help'!"
+        print
+        print "Read the README for more info!"
+        self.game = Chess()
 
+    def parse_input(self, move):
+        if move == "help":
+            return "help"
+        elif move == "quit":
+            return "quit"
+        else:
+            move = move.split()
+            if len(move) > 1:
+                if len(move[0]) >  1 and len(move[1]) > 1:
+                    coords1 = (move[0][0], int(move[0][1]))
+                    coords2 = (move[1][0], int(move[1][1]))
+                    return (coords1, coords2)
+            
+    def play(self):
+        stop = False
+        turn = -1
 
+        print self.game
+        while not stop:
+            turn += 1
+
+            valid = False
+            while not valid:
+                move = raw_input("Player %d > " % ((turn%2)+1))
+                coords = self.parse_input(move)
+
+                # Interprets input
+                if type(coords) is tuple:
+                        output = self.game.move(turn%2, coords[0], coords[1])
+                        print output
+
+                        if output == self.game.__str__():
+                            valid = True
+
+                if coords == None:
+                    print "Input invalid, type 'help' for help"
+                elif coords == "help":
+                    print "Enter move as <from letter><from number>" \
+                            "<to letter><to number>"
+                    print "eg. a3 a5"
+                    print
+                    print "Type 'quit' to quit"
+                elif coords == 'quit':
+                    valid = True
+                    stop = True
+
+            # Checks if anyones captured all the pieces
+            if self.game.get_captured("white") >= 16:
+                print "Player 1 wins!"
+                stop = True
+
+            elif self.game.get_captured("black") >= 16:
+                print "Player 2 wins!"
+                stop = True
+
+        print "Turns played: %d" % turn
+        play_again = raw_input("Would you like to play again? (y/n) ")
+        while True:
+            if play_again in 'yesYes':
+                self.start()
+            elif play_again in 'noNo':
+                print "Thanks for playing!"
+                exit(0)
+            else:
+                print "Not valid, yes or no?"
+        
+    def start(self):
+        self.game.start()
+        self.play()
+
+engine = Engine()
+engine.start()
