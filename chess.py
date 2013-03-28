@@ -232,14 +232,12 @@ class Chess(object):
             if self.board[coords2[0]][coords2[1]] != self.EMPTY:
                 if turn == self.WHITE:
                     if self.board[coords2[0]][coords2[1]] in self.WHITE_PIECES:
-                        print "to friendly"
                         return invalid_move
 
                     else:
                         self.white_captured.append(self.board[coords2[0]][coords2[1]])
                 elif turn == self.BLACK:
                     if self.board[coords2[0]][coords2[1]] in self.BLACK_PIECES:
-                        print 'to friendly'
                         return invalid_move
 
                     else:
@@ -284,7 +282,7 @@ class Chess(object):
                 output += self.board[j][k]
 
         capped = ''
-        capped += "\n\nCapped:"
+        capped += "\n\nCapped: "
         for x in self.black_captured:
             if len(capped)%25 == 0:
                 capped += "\n"
