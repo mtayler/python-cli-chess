@@ -288,8 +288,11 @@ class Chess(object):
             output += "\n%d " % (8-k)
             for j in range(len(self.board[k])):
                 output += self.board[j][k]
+            output += " %d" % (8-k)
+        output += "\n   a  b  c  d  e  f  g  h"
 
         capped = ''
+        
         capped += "\n\nCapped: "
         for x in self.white_captured:
             if len(capped)%25 == 0:
@@ -368,7 +371,7 @@ class Engine():
                     print
                     print "Type 'quit' to quit"
                 elif coords == 'quit':
-                    sure = raw_input("Are you sure you would like to quit? (y/n) ")
+                    sure = raw_input("Are you sure you would like to quit? (y) ")
                     if sure == 'y':
                         valid = True
                         stop = True
@@ -386,8 +389,8 @@ class Engine():
                 stop = True
 
         print "Turns played: %d" % turn
-        play_again = raw_input("\nWould you like to play again? (y/n) ")
         while True:
+            play_again = raw_input("\nWould you like to play again? (y/n) ")
             if play_again == 'y':
                 self.start()
             elif play_again == 'n':
