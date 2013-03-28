@@ -47,7 +47,6 @@ class TestCheck(object):
         
         # Check check_move along y axis
         self.game.board[0][3] = '[R]'
-        print self.game.board
         assert_equal(self.game.check_move(('a',4), ('d',4)), True)
 
         # Check piece in path

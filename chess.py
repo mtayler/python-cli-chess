@@ -59,23 +59,29 @@ class Chess(object):
         """
 
         def pawn(coords1, coords2):
+            # Checks if move is along y axis
+            if coords1[0]-coords2[0] != 0:
+                return False
+
+            # Checks if move is forwards
+            if coord1[1]-coords2[1] < 0:
+                return False
+
             # Checks if piece in movement path
             if coords1[0]-coords2[0] == 0:
                 x = coords1[1]
                 # <= because pawns can't capture forwards
-                while x <= coords2[1][0]:
+                while x <= coords2[1]:
                     if self.board[coords1[0]][x] != self.EMPTY:
+                        print 'piece in path'
                         return False
                     else:
                         x += 1
 
-            # Checks if pawn moves along x axis
-            if coords1[0]-coords2[0] != 0:
-                return False
-
-            if self.board[coords2[0]][coords2[1]] != self.EMPTY:
-                if not abs(coords1[0]-coords2[0]) < 2 \
-                        or not abs(coords1[1]-coords[2]) < 2:
+            # Checks if pawn can make "capture" move (diagnol)
+            if abs(coords1[0]-coords2[0]) == 1 and abs(coords1[1]-coords2[1]) == 1:
+                if self.board[coords2[0]][coords2[1]] == self.EMPTY:
+                    print "capture move invalid"
                     return False 
 
             # Checks if pawn can move 2 squares
@@ -98,6 +104,7 @@ class Chess(object):
                 x = coords1[1]+1
                 while x < coords2[1]:
                     if self.board[coords1[0]][x] != self.EMPTY:
+                        print "y-axis path not clear"
                         return False
                     else:
                         x += 1
@@ -105,16 +112,16 @@ class Chess(object):
             elif coords1[1]-coords2[1] == 0:
                 x = coords1[0]+1
                 while x < coords2[0]:
-                    if self.board[coords1[1]][x] != self.EMPTY:
+                    print "self.board[coords1[1]][x]: %r" % (self.board[coords1[1]][x])
+                    if self.board[x][coords1[1]] != self.EMPTY:
+                        print "x-axis path not clear"
                         return False
                     else:
                         x += 1
 
             # Ensures move is only along one axis
-            x_delta = coords1[0]-coords2[0]
-            y_delta = coords1[1]-coords2[1]
-            if coords1[0]-coords[2] != 0 and coords1[1]-coords2[1] != 0:
-                print "not only one direction"
+            if coords1[0]-coords2[0] != 0 and coords1[1]-coords2[1] != 0:
+                print "not only 1 direction"
                 return False
             
             return True
@@ -158,12 +165,12 @@ class Chess(object):
             return queen(coords1, coords2)
 
 
-        if coords2[0] > 8 or coords2[1] > 'h':
+        if coords2[0] > 'h' or coords2[1] > 8:
             return False
 
         # Remove after move is implemented
-        coords1 = (ord(coords1[0])-ord('a'), coord1[1]-1)
-        coords2 = (ord(coords2[0])-ord('a'), coord2[1]-1)
+        coords1 = (ord(coords1[0])-ord('a'), coords1[1]-1)
+        coords2 = (ord(coords2[0])-ord('a'), coords2[1]-1)
 
         piece = self.board[coords1[0]][coords1[1]]
 
