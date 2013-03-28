@@ -136,13 +136,21 @@ class Chess(object):
             return True
 
         def knight(coords1, coords2):
-            if not abs(coords1[0]-coords2[0]) == 1 \
-                    and not abs(coords1[1]-coords2[1]) == 2 \
-                    or not abs(coords1[1]-coords2[1]) == 1 \
-                    and not abs(coords1[0]-coords2[0]) == 2:
-                return False
+            x_delta = abs(coords1[0]-coords2[0])
+            y_delta = abs(coords1[1]-coords2[1])
 
-            return True
+            print "x_delta: %r" % x_delta
+            print "y_delta: %r" % y_delta
+
+            if y_delta == 2 and x_delta == 1:
+                print "Vertical L"
+                return True
+
+            elif y_delta == 1 and x_delta == 2:
+                print "Horizontal L"
+                return True
+
+            return False
 
         def bishop(coords1, coords2):
             # Checks if move is diagnol

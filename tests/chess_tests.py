@@ -62,7 +62,7 @@ class TestCheck(object):
         assert_equal(self.game.check_move(('g',1), ('f',3)), True)
         
         # Check horizontal L
-        self.game.board[3][3]
+        self.game.board[3][3] = '[H]'
         assert_equal(self.game.check_move(('d',4), ('c',6)), True)
 
         # Check invalid
