@@ -17,3 +17,4 @@ peninsula.games@gmail.com
 TODO:
 - Implement checking and check-mate
 - Implement unusual moves such as castling
+- Implement custom piece representation
